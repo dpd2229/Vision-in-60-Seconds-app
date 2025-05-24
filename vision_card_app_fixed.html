@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vision in 60 Seconds!</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 300;
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+            align-items: start;
+        }
+
+        .tiles-section {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+
+        .tiles-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .tiles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .statement-tile {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 15px 10px;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            user-select: none;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 70px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .statement-tile:hover, .statement-tile:active {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .statement-tile.selected {
+            background: linear-gradient(135deg, #FF6B6B 0%, #FF5252 100%);
+            transform: scale(0.95);
+        }
+
+        .statement-tile:nth-child(2n) { background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%); }
+        .statement-tile:nth-child(3n) { background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%); }
+        .statement-tile:nth-child(4n) { background: linear-gradient(135deg, #E91E63 0%, #C2185B 100%); }
+        .statement-tile:nth-child(5n) { background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%); }
+        .statement-tile:nth-child(6n) { background: linear-gradient(135deg, #00BCD4 0%, #0097A7 100%); }
+        .statement-tile:nth-child(7n) { background: linear-gradient(135deg, #FF5722 0%, #D84315 100%); }
+
+        .statement-tile:nth-child(2n).selected { background: linear-gradient(135deg, #FF6B6B 0%, #FF5252 100%); }
+        .statement-tile:nth-child(3n).selected { background: linear-gradient(135deg, #FF6B6B 0%, #FF5252 100%); }
+        .statement-tile:nth-child(4n).selected { background: linear-gradient(135deg, #FF6B6B 0%, #FF5252 100%); }
+        .statement-tile:nth-child(5n).selected { background: linear-gradient(135deg, #FF6B6B 0%, #FF5252 100%); }
+        .statement-tile:nth-child(6n).selected { background: linear-gradient(135deg, #FF6B6B 0%, #FF5252 100%); }
+        .statement-tile:nth-child(7n).selected { background: linear-gradient(135deg, #FF6B6B 0%, #FF5252 100%); }
+
+        .profile-section {
+            position: sticky;
+            top: 20px;
+        }
+
+        .profile-card {
+            width: 420px;
+            height: 280px;
+            margin: 0 auto;
+            perspective: 1000px;
+            margin-bottom: 20px;
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+        }
+
+        .card-inner.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            border: 4px solid #1a237e;
+            background: white;
+            padding: 15px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            flex-shrink: 0;
+            height: 40px;
+        }
+
+        .card-title-section {
+            flex: 1;
+            text-align: center;
+            margin: 0 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1rem;
+            line-height: 1.1;
+            margin: 0;
+        }
+
+        .student-initial {
+            width: 35px;
+            height: 35px;
+            border: 2px solid #333;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            background: #FFF59D;
+            flex-shrink: 0;
+            font-size: 14px;
+        }
+
+        .logo {
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA000 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+            flex-shrink: 0;
+            color: white;
+            border: 2px solid #333;
+        }
+
+        .drop-zone {
+            flex: 1;
+            border: 2px dashed #ccc;
+            border-radius: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 10px;
+            align-items: flex-start;
+            align-content: flex-start;
+            background: linear-gradient(135deg, #f8f9ff 0%, #f0f8f0 100%);
+            transition: all 0.3s ease;
+            position: relative;
+            min-height: 0;
+            overflow-y: auto;
+        }
+
+        .drop-zone.drag-over {
+            border-color: #4CAF50;
+            background: linear-gradient(135deg, #f0f8f0 0%, #e8f5e8 100%);
+            transform: scale(1.02);
+        }
+
+        .drop-zone.empty::before {
+            content: "Click tiles to add them here";
+            color: #999;
+            font-style: italic;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            font-size: 0.9rem;
+        }
+
+        .dropped-tile {
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            position: relative;
+            border: 2px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            line-height: 1.2;
+        }
+
+        .dropped-tile:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .dropped-tile:hover::after {
+            content: "×";
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #f44336;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        /* Preserve original tile colors when dropped */
+        .dropped-tile[data-color="0"] { background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); }
+        .dropped-tile[data-color="1"] { background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%); }
+        .dropped-tile[data-color="2"] { background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%); }
+        .dropped-tile[data-color="3"] { background: linear-gradient(135deg, #E91E63 0%, #C2185B 100%); }
+        .dropped-tile[data-color="4"] { background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%); }
+        .dropped-tile[data-color="5"] { background: linear-gradient(135deg, #00BCD4 0%, #0097A7 100%); }
+        .dropped-tile[data-color="6"] { background: linear-gradient(135deg, #FF5722 0%, #D84315 100%); }
+
+        .challenge-section {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 10px;
+            flex-shrink: 0;
+        }
+
+        .challenge-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.75rem;
+        }
+
+        .challenge-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .challenge-dot.red { background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%); }
+        .challenge-dot.orange { background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); }
+        .challenge-dot.green { background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%); }
+
+        .text-input {
+            flex: 1;
+            padding: 4px 6px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+        }
+
+        .vision-target {
+            border: 2px dashed #666;
+            padding: 6px;
+            border-radius: 8px;
+            margin: 8px 0;
+            text-align: center;
+            background: rgba(102, 126, 234, 0.05);
+            flex-shrink: 0;
+        }
+
+        .vision-target h4 {
+            font-size: 0.7rem;
+            margin-bottom: 4px;
+            color: #333;
+        }
+
+        .back-header {
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+
+        .back-footer {
+            font-size: 0.65rem;
+            font-weight: bold;
+            margin: 4px 0;
+            flex-shrink: 0;
+        }
+
+        .contact-section {
+            text-align: center;
+            margin-bottom: 6px;
+            flex-shrink: 0;
+        }
+
+        .bottom-text {
+            font-size: 0.45rem;
+            color: #999;
+            text-align: center;
+            margin-top: auto;
+            flex-shrink: 0;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #2196F3;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .instructions {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .instructions h3 {
+            margin-bottom: 10px;
+        }
+
+        .instructions ol {
+            margin-left: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .profile-card {
+                width: 100%;
+                max-width: 420px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .tiles-grid {
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            }
+        }
+
+        @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+            
+            body {
+                margin: 0;
+                padding: 0;
+                background: white !important;
+            }
+            
+            .print-cards {
+                display: block !important;
+                visibility: visible !important;
+                position: static !important;
+                width: 100% !important;
+                height: auto !important;
+                background: white !important;
+                z-index: auto !important;
+            }
+            
+            .print-cards * {
+                visibility: visible !important;
+            }
+            
+            .container, .main-content, .tiles-section, .profile-section, .instructions, .header {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Vision in 60 Seconds!</h1>
+            <p>Create personalized vision profiles for students</p>
+        </div>
+
+        <div class="instructions">
+            <h3>How to use:</h3>
+            <ol>
+                <li>Click statement tiles to add them to the profile card</li>
+                <li>Click "Flip Card" to add detailed notes on the back</li>
+                <li>Fill in challenge levels and additional information</li>
+                <li>Download as PDF for printing and cutting</li>
+            </ol>
+        </div>
+
+        <div class="main-content">
+            <div class="tiles-section">
+                <h2>Statement Tiles</h2>
+                <div class="tiles-grid" id="tilesGrid">
+                    <!-- Tiles will be generated by JavaScript -->
+                </div>
+                <p style="color: #666; font-size: 0.9rem; margin-top: 15px;">
+                    💡 Click tiles to add them to the profile card. Click tiles in the card to remove them.
+                </p>
+            </div>
+
+            <div class="profile-section">
+                <div class="profile-card">
+                    <div class="card-inner" id="cardInner">
+                        <div class="card-front">
+                            <div class="card-header">
+                                <div class="student-initial" contenteditable="true">XX</div>
+                                <div class="card-title-section">
+                                    <div class="card-title" contenteditable="true">Make it<br>Easier to See!</div>
+                                </div>
+                                <div class="logo">💡</div>
+                            </div>
+                            <div class="drop-zone empty" id="dropZone">
+                                <!-- Dropped tiles will appear here -->
+                            </div>
+                        </div>
+                        
+                        <div class="card-back">
+                            <div class="back-header">Need to know:</div>
+                            <div class="challenge-section">
+                                <div class="challenge-item">
+                                    <div class="challenge-dot red"></div>
+                                    <input type="text" class="text-input" placeholder="Very challenging..." id="redChallenge">
+                                </div>
+                                <div class="challenge-item">
+                                    <div class="challenge-dot orange"></div>
+                                    <input type="text" class="text-input" placeholder="Challenging..." id="orangeChallenge">
+                                </div>
+                                <div class="challenge-item">
+                                    <div class="challenge-dot green"></div>
+                                    <input type="text" class="text-input" placeholder="Comfortable..." id="greenChallenge">
+                                </div>
+                            </div>
+                            <div class="vision-target">
+                                <h4>Vision Target/Notes</h4>
+                                <input type="text" class="text-input" placeholder="Specific target or goal..." id="visionTarget">
+                            </div>
+                            <div class="back-footer">Find more info here:</div>
+                            <div class="contact-section">
+                                <input type="text" class="text-input" placeholder="Contact info..." id="contactInfo" style="max-width: 200px;">
+                            </div>
+                            <div class="bottom-text">
+                                Created by Vision in 60 Seconds D.Downes 2025
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <button class="btn btn-secondary" onclick="flipCard()">Flip Card</button>
+                    <button class="btn btn-primary" onclick="downloadPDF()">Download PDF</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const statements = [
+            "Better on Left", "Better on Right", "Show it High", "Better in Centre",
+            "Bring it Close", "Big Bright Bold", "Give me Time", "Keep it short",
+            "Clear the Clutter", "My Vision Varies", "Use Real Objects", "Just One Thing",
+            "Eyes or Ears", "Make it Move", "Keep it Still", "Light it Up",
+            "Control the Light", "Talk like Radio", "Sound Cues Vision"
+        ];
+
+        let droppedTiles = [];
+        let isFlipped = false;
+        let selectedTiles = new Set();
+
+        function initializeTiles() {
+            const tilesGrid = document.getElementById('tilesGrid');
+            statements.forEach((statement, index) => {
+                const tile = document.createElement('div');
+                tile.className = 'statement-tile';
+                tile.textContent = statement;
+                tile.dataset.statement = statement;
+                tile.dataset.colorIndex = index % 7;
+                
+                tile.addEventListener('click', () => {
+                    toggleTile(statement, index % 7, tile);
+                });
+                
+                tilesGrid.appendChild(tile);
+            });
+        }
+
+        function toggleTile(statement, colorIndex, tileElement) {
+            if (selectedTiles.has(statement)) {
+                // Remove from selection
+                selectedTiles.delete(statement);
+                tileElement.classList.remove('selected');
+                droppedTiles = droppedTiles.filter(tile => tile.statement !== statement);
+            } else {
+                // Add to selection
+                selectedTiles.add(statement);
+                tileElement.classList.add('selected');
+                droppedTiles.push({statement, colorIndex});
+            }
+            updateDropZone();
+        }
+
+        function updateDropZone() {
+            const dropZone = document.getElementById('dropZone');
+            
+            if (droppedTiles.length === 0) {
+                dropZone.classList.add('empty');
+                dropZone.innerHTML = '';
+            } else {
+                dropZone.classList.remove('empty');
+                dropZone.innerHTML = '';
+                
+                droppedTiles.forEach(tileData => {
+                    const tile = document.createElement('div');
+                    tile.className = 'dropped-tile';
+                    tile.textContent = tileData.statement;
+                    tile.dataset.color = tileData.colorIndex;
+                    tile.onclick = () => removeTile(tileData.statement);
+                    dropZone.appendChild(tile);
+                });
+            }
+        }
+
+        function removeTile(statement) {
+            selectedTiles.delete(statement);
+            droppedTiles = droppedTiles.filter(tile => tile.statement !== statement);
+            
+            // Update the original tile appearance
+            const originalTile = Array.from(document.querySelectorAll('.statement-tile'))
+                .find(tile => tile.dataset.statement === statement);
+            if (originalTile) {
+                originalTile.classList.remove('selected');
+            }
+            
+            updateDropZone();
+        }
+
+        function flipCard() {
+            const cardInner = document.getElementById('cardInner');
+            isFlipped = !isFlipped;
+            cardInner.classList.toggle('flipped');
+        }
+
+        async function downloadPDF() {
+            // Simple check for libraries
+            if (typeof window.jsPDF === 'undefined' || typeof html2canvas === 'undefined') {
+                alert('PDF libraries not available. Using print function instead...');
+                printCards();
+                return;
+            }
+
+            try {
+                // Create a fresh PDF document
+                const { jsPDF } = window.jsPDF;
+                const pdf = new jsPDF({
+                    orientation: 'landscape',
+                    unit: 'mm',
+                    format: 'a4'
+                });
+
+                // Create containers for both card sides
+                const frontContainer = createCardContainer();
+                const backContainer = createCardContainer();
+
+                // Clone and prepare the front card
+                const cardFront = document.querySelector('.card-front').cloneNode(true);
+                prepareCardForCapture(cardFront);
+                frontContainer.appendChild(cardFront);
+
+                // Clone and prepare the back card
+                const cardBack = document.querySelector('.card-back').cloneNode(true);
+                prepareCardForCapture(cardBack);
+                backContainer.appendChild(cardBack);
+
+                // Capture both cards
+                const frontCanvas = await html2canvas(frontContainer, {
+                    scale: 2,
+                    useCORS: true,
+                    backgroundColor: '#ffffff',
+                    width: 420,
+                    height: 280
+                });
+
+                const backCanvas = await html2canvas(backContainer, {
+                    scale: 2,
+                    useCORS: true,
+                    backgroundColor: '#ffffff',
+                    width: 420,
+                    height: 280
+                });
+
+                // Calculate positioning for A4 landscape (297mm x 210mm)
+                const cardWidthMM = 120;
+                const cardHeightMM = 80;
+                const spacing = 30;
+                const totalWidth = cardWidthMM * 2 + spacing;
+                const startX = (297 - totalWidth) / 2;
+                const cardY = (210 - cardHeightMM) / 2;
+
+                // Add title
+                pdf.setFontSize(16);
+                pdf.setTextColor(50, 50, 50);
+                pdf.text('Vision Profile Cards - Print & Cut', 297/2, 30, { align: 'center' });
+                
+                pdf.setFontSize(10);
+                pdf.text('Cut along the dashed lines. Each card measures 120mm x 80mm.', 297/2, 40, { align: 'center' });
+
+                // Add the card images
+                const frontImgData = frontCanvas.toDataURL('image/png');
+                const backImgData = backCanvas.toDataURL('image/png');
+                
+                pdf.addImage(frontImgData, 'PNG', startX, cardY, cardWidthMM, cardHeightMM);
+                pdf.addImage(backImgData, 'PNG', startX + cardWidthMM + spacing, cardY, cardWidthMM, cardHeightMM);
+
+                // Add labels
+                pdf.setFontSize(12);
+                pdf.setTextColor(100, 100, 100);
+                pdf.text('FRONT', startX + cardWidthMM/2, cardY + cardHeightMM + 15, { align: 'center' });
+                pdf.text('BACK', startX + cardWidthMM + spacing + cardWidthMM/2, cardY + cardHeightMM + 15, { align: 'center' });
+
+                // Add cutting guidelines
+                pdf.setDrawColor(150, 150, 150);
+                pdf.setLineWidth(0.3);
+                pdf.setLineDashPattern([2, 2], 0);
+                
+                // Front card border
+                pdf.rect(startX - 2, cardY - 2, cardWidthMM + 4, cardHeightMM + 4);
+                
+                // Back card border  
+                pdf.rect(startX + cardWidthMM + spacing - 2, cardY - 2, cardWidthMM + 4, cardHeightMM + 4);
+
+                // Save the PDF
+                pdf.save('vision-profile-cards.pdf');
+
+                // Clean up
+                document.body.removeChild(frontContainer);
+                document.body.removeChild(backContainer);
+
+            } catch (error) {
+                console.error('PDF generation failed:', error);
+                alert('PDF generation failed. Using print function instead...');
+                printCards();
+            }
+        }
+
+        function printCards() {
+            // Create a print-friendly version
+            const printContainer = document.createElement('div');
+            printContainer.className = 'print-cards';
+            printContainer.style.position = 'fixed';
+            printContainer.style.top = '0';
+            printContainer.style.left = '0';
+            printContainer.style.width = '100vw';
+            printContainer.style.height = '100vh';
+            printContainer.style.backgroundColor = 'white';
+            printContainer.style.zIndex = '9999';
+            printContainer.style.padding = '20mm';
+            printContainer.style.display = 'flex';
+            printContainer.style.flexDirection = 'column';
+            printContainer.style.alignItems = 'center';
+            printContainer.style.gap = '20px';
+
+            // Add title
+            const title = document.createElement('h1');
+            title.textContent = 'Vision Profile Cards - Print & Cut';
+            title.style.fontSize = '24px';
+            title.style.marginBottom = '10px';
+            title.style.color = '#333';
+            printContainer.appendChild(title);
+
+            const subtitle = document.createElement('p');
+            subtitle.textContent = 'Cut along the borders. Each card measures approximately 120mm x 80mm.';
+            subtitle.style.fontSize = '14px';
+            subtitle.style.marginBottom = '30px';
+            subtitle.style.color = '#666';
+            printContainer.appendChild(subtitle);
+
+            // Create cards container
+            const cardsContainer = document.createElement('div');
+            cardsContainer.style.display = 'flex';
+            cardsContainer.style.gap = '30px';
+            cardsContainer.style.justifyContent = 'center';
+            cardsContainer.style.alignItems = 'flex-start';
+
+            // Clone and prepare front card
+            const frontCard = document.querySelector('.card-front').cloneNode(true);
+            prepareCardForPrint(frontCard, 'FRONT');
+            cardsContainer.appendChild(frontCard);
+
+            // Clone and prepare back card
+            const backCard = document.querySelector('.card-back').cloneNode(true);
+            prepareCardForPrint(backCard, 'BACK');
+            cardsContainer.appendChild(backCard);
+
+            printContainer.appendChild(cardsContainer);
+            document.body.appendChild(printContainer);
+
+            // Print
+            setTimeout(() => {
+                window.print();
+                // Clean up after print dialog closes
+                setTimeout(() => {
+                    document.body.removeChild(printContainer);
+                }, 1000);
+            }, 100);
+        }
+
+        function prepareCardForPrint(cardElement, label) {
+            cardElement.style.position = 'relative';
+            cardElement.style.transform = 'none';
+            cardElement.style.backfaceVisibility = 'visible';
+            cardElement.style.width = '420px';
+            cardElement.style.height = '280px';
+            cardElement.style.border = '2px solid #333';
+            cardElement.style.borderRadius = '15px';
+            cardElement.style.backgroundColor = 'white';
+            cardElement.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+
+            // Replace input values with text
+            const inputs = cardElement.querySelectorAll('input');
+            inputs.forEach(input => {
+                if (input.value) {
+                    const span = document.createElement('span');
+                    span.textContent = input.value;
+                    span.style.fontSize = input.style.fontSize || '0.65rem';
+                    span.style.color = '#333';
+                    span.style.fontWeight = 'normal';
+                    input.parentNode.replaceChild(span, input);
+                }
+            });
+
+            // Add label below card
+            const labelDiv = document.createElement('div');
+            labelDiv.textContent = label;
+            labelDiv.style.textAlign = 'center';
+            labelDiv.style.marginTop = '10px';
+            labelDiv.style.fontSize = '14px';
+            labelDiv.style.fontWeight = 'bold';
+            labelDiv.style.color = '#666';
+
+            const cardWrapper = document.createElement('div');
+            cardWrapper.appendChild(cardElement);
+            cardWrapper.appendChild(labelDiv);
+            
+            return cardWrapper;
+        }
+
+        function createCardContainer() {
+            const container = document.createElement('div');
+            container.style.position = 'fixed';
+            container.style.left = '-9999px';
+            container.style.top = '0';
+            container.style.background = 'white';
+            container.style.width = '420px';
+            container.style.height = '280px';
+            container.style.overflow = 'hidden';
+            document.body.appendChild(container);
+            return container;
+        }
+
+        function prepareCardForCapture(cardElement) {
+            cardElement.style.position = 'relative';
+            cardElement.style.transform = 'none';
+            cardElement.style.backfaceVisibility = 'visible';
+            cardElement.style.width = '100%';
+            cardElement.style.height = '100%';
+            
+            // Make sure all input values are visible as text
+            const inputs = cardElement.querySelectorAll('input');
+            inputs.forEach(input => {
+                if (input.value) {
+                    const span = document.createElement('span');
+                    span.textContent = input.value;
+                    span.style.fontSize = input.style.fontSize || '0.65rem';
+                    span.style.color = '#333';
+                    input.parentNode.replaceChild(span, input);
+                }
+            });
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeTiles();
+            updateDropZone();
+        });
+    </script>
+</body>
+</html>
